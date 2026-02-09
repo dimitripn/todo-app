@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: todo-app-postgres
+    environment:
+      POSTGRES_DB: todo-db
+      POSTGRES_USER: todo-user
+      POSTGRES_PASSWORD: todo-password
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todo-user -d todo-db"]
+      interval: 5s
+      timeout: 5s
+    restart: unless-stopped
+
+  backend:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    build:
+      context: ./todo-app-backend
+      dockerfile: Dockerfile
+    container_name: todo-app-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./todo-app-backend/.env
+    volumes:
+      - ./todo-app-backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
