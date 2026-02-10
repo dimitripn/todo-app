@@ -30,7 +30,6 @@ app.use(
 		allowedHeaders: ["Content-Type", "Authorization"],
 	}),
 );
-
 app.use(express.json());
 
 app.use("/auth", authRoutes);
@@ -38,6 +37,9 @@ app.use("/tasks", taskRoutes);
 
 app.get("/", (req, res) => {
 	res.send("Welcome to the Todo App API");
+});
+app.get("/health", (req, res) => {
+	res.status(200).send("OK");
 });
 
 export default app;
